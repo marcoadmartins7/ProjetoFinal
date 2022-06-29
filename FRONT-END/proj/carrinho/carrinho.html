@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vending Machine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="carrinho.css">
+    <link rel="shortcut icon" type="image/png" href="../img/logo.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+<div id="container">
+    <nav>
+        <div class="menu">
+          <p id="nome">CARRINHO</p>
+          <a type="button" class="btn btn-outline-light" id="butao" href="../menu/compra.html">MENU INICIAL</a>
+        </div>
+    </nav>
+
+    <div id="carrinho-container"  class="container my-5">
+        <table width="100%">
+            <thead>
+                <tr>
+                    <td>Remove</td>
+                    <td>Imagem</td>
+                    <td>Produto</td>
+                    <td>Preço</td>
+                    <td>Quantidade</td>
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody id="carrinhoBody">
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td id="total" colspan="1">Total: </td>
+                    <td id="totalPrice" style="text-align: left; padding-left: 100px" colspan="3"> </td>
+                    <td id="cancelar" ><a onclick="cancelar()">Cancelar</a> </td>
+                    <td id="finalizar" onclick="returnSaldo()"> <a >Finalizar</a> </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+
+<script>
+let produtos;
+
+document.getElementById("totalPrice").innerHTML = localStorage.getItem("TotalCarrinho") + "€";
+if (localStorage.getItem("produtos") == null || localStorage.getItem("produtos").length == 0 ){
+        produtos = [];
+      
+
+    }else {
+        produtos = JSON.parse(localStorage.getItem("produtos"));    
+}
+
+for (let i=0 ; i < produtos.length ; i++){
+
+    //PRIMEIRA COLUNA- ICONE LIXO
+    var tr = document.createElement('tr');
+    tr.id = produtos[i].id;
+
+    tr.innerHTML= '<td><a onclick= removeItem('+produtos[i].id+','+ produtos[i].preco+','+ produtos[i].quantidade + ')><i class="far fa-trash-alt"></i></a></td>';
+    document.getElementById('carrinhoBody').appendChild(tr);
+
+    //SEGUNDA COLUNA- IMAGEM
+    var tdImagem = document.createElement('td');
+    tdImagem.innerHTML = '<img src='+ produtos[i].imagem +' alt="">'
+    tr.appendChild(tdImagem);
+
+    //TERCEIRA COLUNA - PRODUTO
+    var tdProduto = document.createElement('td');
+    tdProduto.innerHTML = '<h5>'+ produtos[i].nome + '</h5>';
+    tr.appendChild(tdProduto);
+
+    //QUARTA COLUNA- PREÇO
+    var tdPreco = document.createElement('td');
+    tdPreco.innerHTML = '<h5 id="p'+produtos[i].id+'">'+ produtos[i].preco + '</h5>';
+    tr.appendChild(tdPreco);    
+
+    //QUINTA COLUNA- QUANTIDADE
+    var tdQuantidade = document.createElement('td');
+    let string = JSON.stringify(produtos[i].imagem);
+    tdQuantidade.onchange= "updateQuantity("+produtos[i].id+ ','+string+',"'+ produtos[i].nome+'",'+ produtos[i].preco+  ")";
+
+    tdQuantidade.innerHTML = '<input id="s'+produtos[i].id+'"class="w-25 pl-1" onchange="updateQuantity('+i+')"  style="text-align: center;" min="1" value="'+ produtos[i].quantidade+ '" type="number">';
+    tr.appendChild(tdQuantidade);  
+
+    //SEXTA COLUNA- TOTAL
+    var tdTotal = document.createElement('td');
+    let totalTemp = produtos[i].preco * produtos[i].quantidade;
+    tdTotal.innerHTML = '<h5 id="qt'+produtos[i].id+'">'+ totalTemp.toFixed(2) + '</h5>';
+    tr.appendChild(tdTotal);  
+
+
+
+
+}
+
+//REMOVER ITEM DO CARRINHO
+
+function removeItem(idProduto, preco, quantidade){
+
+
+for (let i = 0; i < produtos.length; i++) {
+
+if (produtos[i].id == idProduto){
+    let tempTotal =  localStorage.getItem("TotalCarrinho");
+    let totalProduto = preco* quantidade;
+    let novoTotal= tempTotal - totalProduto;
+
+    produtos.splice(i, 1);
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+    localStorage.setItem("TotalCarrinho", novoTotal.toFixed(2));
+    window.location.reload();
+}
+
+}
+
+
+
+
+}
+
+//QUANTITY ON CHANGE 
+function updateQuantity (index){
+    document.getElementById("qt"+produtos[index].id).innerHTML = "";
+    
+    let temp =  produtos.filter(i => i.id === produtos[index].id);
+          let newQuantity = parseInt(document.getElementById('s'+produtos[index].id).value);
+          escolha= {"id":produtos[index].id,"quantidade": newQuantity, "imagem": produtos[index].imagem, "nome":produtos[index].nome, "preco": produtos[index].preco};
+
+
+
+
+          for (let i = 0; i < produtos.length; i++) {
+
+            if (produtos[i].id == produtos[index].id){
+                produtos.splice(i, 1);
+            }
+
+}
+        produtos.push(escolha);
+        localStorage.setItem("produtos", JSON.stringify(produtos));
+
+
+
+        updateCart();
+        window.location.reload();
+
+
+    
+}
+
+let saldo;
+
+//POST TO DATABASE
+async function finalizar(){
+
+
+let carrinhoID;
+let data = "2022-06-29";
+let precoTotal= localStorage.getItem("TotalCarrinho");
+let idUser= 1;
+console.log("OLA1");
+
+
+
+
+await fetch('http://127.0.0.1:8080/InsertCarrinho/', {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    method: 'post',
+                    body: `data=${data}&precoTotal=${precoTotal}&idUser=${idUser}`
+                }).then(res => res.json())
+            .then((out) => {
+        carrinhoID = out.successID;
+
+            })
+            postProducts(carrinhoID)
+
+        
+
+}
+
+function returnSaldo(){
+    //SUPONDO QUE SO HA O USER 1
+    let idUser = 1;
+
+fetchByBreed();
+    async function fetchByBreed() {
+try {
+const result = fetch(`http://127.0.0.1:8080/Users/?idUser=`+ idUser)
+const response = await result
+const jsonData = await response.json()
+jsonData[0].saldo;
+
+
+saldo= await jsonData[0].saldo;
+verify();
+
+
+} catch (e) {
+throw Error(e) } }
+
+
+
+            }
+ function postProducts(idCarrinho){
+
+
+
+    for(let i=0; i < produtos.length; i++){
+        let idProdutos = produtos[i].id;
+        let quantidade = produtos[i].quantidade;
+
+        console.log(idCarrinho);
+
+        fetch('http://127.0.0.1:8080/InsertProdutoCarrinho/', {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    method: 'post',
+                    body: `idProdutos=${idProdutos}&quantidade=${quantidade}&idCarrinho=${idCarrinho}`
+                })
+    }
+ 
+
+   
+
+sendMail(idCarrinho);
+
+
+    
+}
+
+ function sendMail(idCarrinho){
+
+
+     fetch('http://127.0.0.1:8080/SendMail/', {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    method: 'post',
+                    body: `idCarrinho=${idCarrinho}`
+                })
+
+
+                Swal.fire(
+              
+              '',
+              'Compra Finalizada com Sucesso!',
+              'success'
+      ).then((result) => {
+          resetShop();
+        location.reload();
+      });
+
+}
+
+
+function verify(){
+    let precoTotal= localStorage.getItem("TotalCarrinho");
+
+
+    if (saldo < precoTotal){
+
+Swal.fire(
+              
+        '',
+        'Não Possui Saldo Suficiente!',
+        'error'
+)
+}else {
+    finalizar();
+}
+}
+//RESET CARRINHO
+
+function resetShop(){
+let carrinhoLimpo = []
+
+localStorage.setItem("produtos", carrinhoLimpo);
+localStorage.setItem("TotalCarrinho", 0);
+
+
+}
+//UPDATE CART
+
+function updateCart() {
+
+
+if (localStorage.getItem("TotalCarrinho") != null){
+  let valorTotal= 0;
+
+  for(let i=0 ; localStorage.getItem("produtos") != null && i < produtos.length; i++){
+    valorTotal += produtos[i].preco * produtos[i].quantidade;
+    localStorage.setItem("TotalCarrinho", valorTotal.toFixed(2));
+
+
+  }
+    } else {
+        localStorage.setItem("TotalCarrinho", 0)
+    }
+}
+
+//CANCEL
+
+function cancelar(){
+    resetShop();
+    window.location.replace("../menu/compra.html")
+
+}
+
+</script>
+</html>

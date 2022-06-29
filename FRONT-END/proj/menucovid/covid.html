@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vending Machine</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="covid.css" />
+    <link rel="shortcut icon" type="image/png" href="../img/logo.jpg" />
+    <script src="jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  </head>
+  <body>
+    <nav>
+      <div class="menu">
+        <p id="nome">MENU COVID</p>
+        <a class="basket" href="../carrinho/carrinho.html">
+          <div class="valordiv">
+            <p id="valor"></p>
+          </div>
+          <div class="iconbasket">
+            <img src="../img/basket.png" id="basket-img"  />
+          </div>
+        </a>
+
+        <a type="button" class="btn btn-outline-light" id="butao" href="../menu/compra.html">VOLTAR</a>
+      </div>
+    </nav>
+    <div class="fotos" id="produtosDiv">
+
+    </div>
+  </body>
+
+  <script>
+       //SET CART VALUE
+       $(document).ready(function() {
+        updateCart();
+    });
+
+
+
+
+    let j = 0;
+     //Populate Select Dropdown
+     fetch('http://127.0.0.1:8080/ProdutosCovid/')
+     .then(res => res.json())
+                .then((out) => {
+                    $.each(out, function(index, value) {
+        
+          var a = document.createElement('a');
+          a.id= 'k'+value.idProdutos;
+          a.src= "img/twix.png";
+          a.className = "pic twix";
+          a.innerHTML= '<img id="myimgl" style="max-width:100%; max-height:100%;"  src='+value.imagem+' >';
+                    a.setAttribute('data-before', 'anything');
+    
+    
+       document.getElementById('produtosDiv').appendChild(a);
+    
+    var styleElem = document.getElementById(a.id).appendChild(document.createElement("style"));
+
+    //IF STOCK IS 0
+
+    if (value.stock == 0) {
+      styleElem.innerHTML = "#"+a.id+":before {content: 'ESGOTADO'; text-align: center; white-space: pre-wrap; display: block; margin-left: auto; margin-right: auto; width: 35%;}";
+
+    } else {
+          //ADICIONAR AO CARRINHO COM CLICK
+      document.getElementById(a.id).setAttribute('onclick','addFunction('+ value.idProdutos +', "'+ value.imagem + '" , "' + value.nome +'" ,'+ value.preco +')');
+      styleElem.innerHTML = "#"+a.id+":before {content: '"+value.nome+" "+value.preco+"€'; text-align: center; white-space: pre-wrap; display: block; margin-left: auto; margin-right: auto; width: 35%;}";
+
+    }
+    
+    
+    j++ ;
+
+    
+     });
+
+
+                }).catch(err => console.error(err));
+    </script>
+
+    <script>
+//ADD TO CART
+
+
+function addFunction (idProduto, imagem, nome, preco){
+
+let escolha;
+let quantidade; 
+let totalCart;
+let produtos;
+
+
+//CHANGE CART VALUE
+
+totalCart = parseFloat(localStorage.getItem("TotalCarrinho")) + preco;
+localStorage.setItem("TotalCarrinho", totalCart.toFixed(2));
+
+
+
+// ADD TO CART
+
+    if (localStorage.getItem("produtos") == null || localStorage.getItem("produtos").length == 0 ){
+        produtos = [];
+      
+
+    }else {
+        produtos = JSON.parse(localStorage.getItem("produtos"));    
+}
+
+
+if (produtos.filter(i => i.id === idProduto).length == 0){
+
+            escolha= {"id":idProduto,"quantidade":1, "imagem": imagem, "nome": nome, "preco": preco};
+            produtos.push(escolha);
+            localStorage.setItem("produtos", JSON.stringify(produtos));     
+
+        } else {
+          let temp =  produtos.filter(i => i.id === idProduto);
+          let newQuantity = temp[0].quantidade  + 1;
+          escolha= {"id":idProduto,"quantidade": newQuantity, "imagem": imagem, "nome":nome, "preco": preco};
+
+
+
+
+          for (let i = 0; i < produtos.length; i++) {
+
+            if (produtos[i].id == idProduto){
+                produtos.splice(i, 1);
+            }
+
+}
+        produtos.push(escolha);
+        localStorage.setItem("produtos", JSON.stringify(produtos));
+
+
+        }
+    
+
+    Swal.fire(
+              
+              '',
+        'Produto Adicionado ao Carrinho',
+        'success'
+      ).then(
+        updateCart()
+      )
+
+
+
+
+
+}
+
+//UPDATE CART
+
+function updateCart() {
+
+  let produtos;
+
+
+  if (localStorage.getItem("produtos") == null || localStorage.getItem("produtos").length == 0 ){
+        produtos = [];
+      
+
+    }else {
+        produtos = JSON.parse(localStorage.getItem("produtos"));    
+}
+
+
+
+    if (localStorage.getItem("TotalCarrinho") != null){
+      let valorTotal=0;
+
+      for(let i=0 ; i < produtos.length; i++){
+        valorTotal += produtos[i].preco * produtos[i].quantidade;
+        localStorage.setItem("TotalCarrinho", valorTotal.toFixed(2));
+
+
+      }
+        document.getElementById("valor").innerHTML = valorTotal.toFixed(2) + '€';
+        } else {
+            localStorage.setItem("TotalCarrinho", 0)
+            document.getElementById("valor").innerHTML = 0 + '€';
+        }
+}
+
+    
+        </script>
+</html>

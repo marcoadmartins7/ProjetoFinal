@@ -1,0 +1,153 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;500&display=swap");
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none !important;
+  caret-color: rgba(0, 0, 0, 0);
+}
+a {
+  color: rgba(0, 0, 0, 0.664);
+}
+
+a:hover {
+  color: rgb(0, 0, 0);
+}
+nav {
+  width: 100%;
+  height: 70px;
+  background-color: rgb(168, 232, 157);
+  line-height: 4.5rem;
+  position: fixed;
+  z-index: 1;
+}
+nav .menu {
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 0.5rem;
+}
+nav .menu p {
+  text-align: center;
+  color: white;
+  text-transform: uppercase;
+}
+
+.fotos {
+  width: 90%;
+  margin: auto;
+  padding-top: 10%;
+  display: flex;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 50px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pic {
+  position: relative;
+  height: 15rem;
+  border-radius: 10px;
+  box-shadow: 2px 6px 10px;
+  width: 25%;
+}
+
+.pic img {
+  width: 100%;
+  height: 100%;
+}
+
+.pic::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  width: 100%;
+  margin-top: -100px;
+  opacity: 0;
+  transition: 0.3s;
+  transition-delay: 0.2s;
+  z-index: 1;
+  letter-spacing: 0.2rem;
+}
+
+.pic::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  border-radius: 10px;
+  height: 0;
+  background-color: rgba(29, 29, 29, 0.623);
+  transition: 0.3s;
+}
+
+.pic:hover::after {
+  height: 100%;
+}
+
+.pic:hover::before {
+  margin-top: 0;
+  opacity: 1;
+}
+
+#bebidasfrias img {
+  max-height: 85%;
+  max-width: 85%;
+}
+#bebidasquentes img {
+  max-height: 100%;
+  max-width: 100%;
+}
+#snacks img {
+  max-height: 130%;
+  max-width: 130%;
+}
+#material img {
+  max-height: 90%;
+  max-width: 90%;
+}
+#covid img {
+  max-height: 100%;
+  max-width: 100%;
+}
+#produtos img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.pic img {
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+#bebidasquentes::before {
+  content: "BEBIDAS QUENTES";
+}
+#snacks::before {
+  content: "SNACKS";
+}
+#bebidasfrias::before {
+  content: "BEBIDAS FRIAS";
+}
+#material::before {
+  content: "MATERIAL ESCOLAR";
+}
+#covid::before {
+  content: "COVID";
+}
+#produtos::before {
+  content: "PRODUTOS";
+}
